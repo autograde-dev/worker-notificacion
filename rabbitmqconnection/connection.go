@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"os"
 
-	evaluation "github.com/autograde-dev/worker-notificacion/evaluation"
+	notification "github.com/autograde-dev/worker-notificacion/notification"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -25,6 +24,8 @@ func FailOnError(err error, msg string) {
 func ConnectMQ() (*amqp.Connection, *amqp.Channel) {
 	rbmq_user := os.Getenv("RABBITMQ_DEFAULT_USER")
 	rbmq_pass := os.Getenv("RABBITMQ_DEFAULT_PASS")
+	fmt.Println(rbmq_user)
+	fmt.Println(rbmq_pass)
 	constr := fmt.Sprintf("amqp://%s:%s@%s:5672/", rbmq_user, rbmq_pass, os.Getenv("RABBITMQ_HOST"))
 	conn, err := amqp.Dial(constr)
 	FailOnError(err, "Failed to connect to RabbitMQ")
@@ -70,28 +71,16 @@ func (r *RabbitMQ) Consume() {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("1.Received a message: %s", d.Body)
-			// call worker-evaluation
-
-			var msg evaluation.Evaluation
+			var msg notification.Notification
 			err := json.Unmarshal(d.Body, &msg)
 			if err != nil {
 				log.Printf("Error parsing JSON: %s", err)
 				continue
 			}
-
-			requestURL := fmt.Sprintf(
-				"http://%s?nameFileAnswer=%s&nameFileEvaluation=%s&nameBucket=%s&ideValuation=%d",
-				os.Getenv("WORKER_EVALUATION_HOST"),
-				msg.NameFileAnswer,
-				msg.NameFileEvaluation,
-				msg.NameBucket,
-				msg.IDEValuation,
-			)
-			res, err := http.Get(requestURL)
-			log.Printf("2. Request to worker-evaluation id: %d res status %s", msg.IDEValuation, res.Status)
+			
+			err = msg.SendNotifications()
 			if err != nil {
-				log.Printf("Error making request to worker-evaluation: %s", err)
+				log.Printf("Error sending notifications: %s", err)
 				ch.Reject(d.DeliveryTag, true)
 				continue
 			}

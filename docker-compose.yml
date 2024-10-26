@@ -8,7 +8,10 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
       RABBITMQ_HOST: rabbitmq
-      QUEUE_NAME: evaluation
-      WORKER_EVALUATION_HOST: evaluation:8080
+      PSQL_HOST: postgres
+      PSQL_USER: ${POSTGRES_USER}
+      PSQL_PASS: ${POSTGRES_PASSWORD}
+      PSQL_DB: ${POSTGRES_DB}
+      PSQL_PORT: 5432
       PORT: 8080
     container_name: notification
