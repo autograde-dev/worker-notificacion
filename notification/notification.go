@@ -13,8 +13,7 @@ type Notification struct {
 }
 
 func (n *Notification) GetNotificationMessage() string {
-	n.student
-	return "dear " + n.student.primer_nombre + " " + n.student.primer_apellido + " your evaluation is ready"
+	return "dear " + n.student.Primer_nombre + " " + n.student.Primer_apellido + " your evaluation is ready"
 }
 
 func (n *Notification) SendNotifications() (error) {

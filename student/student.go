@@ -5,20 +5,20 @@ package student
 // )
 
 type Student struct {
-	id_estudiante int
-	primer_nombre      string
-	segundo_nombre     string
-	primer_apellido   string
-	segundo_apellido  string
-	correo string	
+	Id_estudiante int
+	Primer_nombre      string
+	Segundo_nombre     string
+	Primer_apellido   string
+	Segundo_apellido  string
+	Correo string	
 }
 
 
 func (s *Student) GetStudentByEvaluationId(evaluationId int) {
-	s.id_estudiante = evaluationId
-	s.primer_nombre = "Juan"
-	s.segundo_nombre = "Pablo"
-	s.primer_apellido = "Perez"
-	s.segundo_apellido = "Gomez"
-	s.correo = "a@g.com"
+	s.Id_estudiante = evaluationId
+	s.Primer_nombre = "Juan"
+	s.Segundo_nombre = "Pablo"
+	s.Primer_apellido = "Perez"
+	s.Segundo_apellido = "Gomez"
+	s.Correo = "a@g.com"
 }
