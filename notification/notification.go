@@ -13,7 +13,13 @@ type Notification struct {
 }
 
 func (n *Notification) GetNotificationMessage() string {
-	return "dear " + n.student.Primer_nombre + " " + n.student.Primer_apellido + " your evaluation is ready"
+	msg := "dear " + n.student.Primer_nombre + " " + n.student.Primer_apellido + " your evaluation is ready. "
+	if n.IsValid {
+		msg += "your result is Valid "
+	} else {
+	msg += "your result is Invalid"
+	}
+	return msg
 }
 
 func (n *Notification) SendNotifications() (error) {
@@ -26,5 +32,5 @@ func (n *Notification) SendNotifications() (error) {
 }
 
 func (n *Notification) SendLogNotification() {
-	log.Println("Sending log notification")
+	log.Println("Log notification:" + n.GetNotificationMessage())
 }

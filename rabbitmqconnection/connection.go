@@ -24,8 +24,6 @@ func FailOnError(err error, msg string) {
 func ConnectMQ() (*amqp.Connection, *amqp.Channel) {
 	rbmq_user := os.Getenv("RABBITMQ_DEFAULT_USER")
 	rbmq_pass := os.Getenv("RABBITMQ_DEFAULT_PASS")
-	fmt.Println(rbmq_user)
-	fmt.Println(rbmq_pass)
 	constr := fmt.Sprintf("amqp://%s:%s@%s:5672/", rbmq_user, rbmq_pass, os.Getenv("RABBITMQ_HOST"))
 	conn, err := amqp.Dial(constr)
 	FailOnError(err, "Failed to connect to RabbitMQ")
