@@ -1,0 +1,6 @@
+curl http://localhost:8082/evaluation -X POST -d '{
+  "NameFileEvaluation": "Test",
+  "NameFileAnswer": "Test ANSWER",
+  "NameBucket": "TestBucket",
+  "IDEValuation": 1
+}'
