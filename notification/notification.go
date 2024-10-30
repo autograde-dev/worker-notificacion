@@ -49,7 +49,7 @@ type LogNotification struct {
 }
 
 func (n *LogNotification) GetNotificationMessage() string {
-	msg := "dear " + n.Student.PrimerNombre + " " + n.Student.PrimerApellido + "this is a log notification that your evaluation with id " + strconv.Itoa(n.IdEvaluation) + " is ready. "
+	msg := "Dear " + n.Student.PrimerNombre + " " + n.Student.PrimerApellido + " this is a log notification that your evaluation with id " + strconv.Itoa(n.IdEvaluation) + " is ready. "
 	if n.IsValid {
 		msg += "your result is Valid "
 	} else {
