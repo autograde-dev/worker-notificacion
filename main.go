@@ -8,8 +8,10 @@ import (
 )
 
 func main() {
-	test.Test()
-	queue_name := os.Getenv("QUEUE_NAME")
+	if os.Getenv("RUN_TEST") == "true" {
+		test.Test()
+	}
+	queue_name := os.Getenv("RABBITMQ_QUEUE_NAME_EVA")
 	if queue_name == "" {
 		queue_name = "notifications"
 	}

@@ -21,7 +21,7 @@ func FailOnError(err error, msg string) {
 	}
 }
 
-func ConnectMQ() (*amqp.Connection, *amqp.Channel) {
+func ConnectMQ() *amqp.Channel {
 	rbmq_user := os.Getenv("RABBITMQ_DEFAULT_USER")
 	rbmq_pass := os.Getenv("RABBITMQ_DEFAULT_PASS")
 	constr := fmt.Sprintf("amqp://%s:%s@%s:5672/", rbmq_user, rbmq_pass, os.Getenv("RABBITMQ_HOST"))
@@ -31,7 +31,7 @@ func ConnectMQ() (*amqp.Connection, *amqp.Channel) {
 	ch, err := conn.Channel()
 	FailOnError(err, "Failed to open a channel")
 
-	return conn, ch
+	return ch
 }
 
 func CloseMQ(conn *amqp.Connection, channel *amqp.Channel) {
@@ -41,8 +41,8 @@ func CloseMQ(conn *amqp.Connection, channel *amqp.Channel) {
 
 func (r *RabbitMQ) Consume() {
 
-	conn, ch := ConnectMQ()
-	defer CloseMQ(conn, ch)
+	ch := ConnectMQ()
+	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
 		r.QueueName, // name
@@ -64,28 +64,20 @@ func (r *RabbitMQ) Consume() {
 		nil,    // args
 	)
 	FailOnError(err, "Failed to declare a queue")
-
-	k := make(chan bool)
-
+	forever := make(chan bool)
 	go func() {
 		for d := range msgs {
-			var msg notification.Notification
+			var msg notification.NotificationFactory
 			err := json.Unmarshal(d.Body, &msg)
 			if err != nil {
 				log.Printf("Error parsing JSON: %s", err)
 				continue
 			}
-			
-			err = msg.SendNotifications()
-			if err != nil {
-				log.Printf("Error sending notifications: %s", err)
-				ch.Reject(d.DeliveryTag, true)
-				continue
-			}
-			d.Ack(false)
+			msg.Notify()
 		}
 	}()
 
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
-	<-k
+	log.Printf(" [*] Waiting for messages in %s. To exit press CTRL+C", r.QueueName)
+	<-forever
+
 }

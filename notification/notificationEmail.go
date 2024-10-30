@@ -3,15 +3,33 @@ package notification
 import (
 	"log"
 	"os"
+	"strconv"
 
+	student "github.com/autograde-dev/worker-notificacion/student"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-func (n *Notification) SendEmailNotification() {
+type NotificationEmail struct {
+	IdEvaluation int
+	Student      student.Student
+	IsValid      bool
+}
+
+func (n *NotificationEmail) GetNotificationMessage() string {
+	msg := "dear " + n.Student.PrimerNombre + " " + n.Student.PrimerApellido + "this is an email notification that your evaluation with id " + strconv.Itoa(n.IdEvaluation) + " is ready. "
+	if n.IsValid {
+		msg += "your result is Valid "
+	} else {
+		msg += "your result is Invalid"
+	}
+	return msg
+}
+
+func (n *NotificationEmail) Notify() {
 	from := mail.NewEmail("Example User", "test@example.com")
 	subject := ""
-	to := mail.NewEmail("Correo estudiante", n.student.Correo)
+	to := mail.NewEmail("Correo estudiante", n.Student.Correo)
 	plainTextContent := n.GetNotificationMessage()
 	htmlContent := ""
 	message := mail.NewSingleEmail(from, subject, to, plainTextContent, htmlContent)

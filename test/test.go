@@ -1,20 +1,21 @@
 package test
 
 import (
-	"os"
 	"context"
+	"os"
 	"time"
-	amqp "github.com/rabbitmq/amqp091-go"
+
 	connection "github.com/autograde-dev/worker-notificacion/rabbitmqconnection"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func Test() {
-	queue_name := os.Getenv("QUEUE_NAME")
+	queue_name := os.Getenv("RABBITMQ_QUEUE_NAME_EVA")
 	if queue_name == "" {
 		queue_name = "notifications"
 	}
-	conn, ch := connection.ConnectMQ()
-	defer connection.CloseMQ(conn, ch)
+	ch := connection.ConnectMQ()
+	defer ch.Close()
 	q, err := ch.QueueDeclare(
 		queue_name, // name
 		true,       // durable
@@ -26,7 +27,7 @@ func Test() {
 	connection.FailOnError(err, "Failed to declare a queue")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	body:= []byte(`{"idEvaluation":1,"isValid":true}`)
+	body := []byte(`{"idEvaluation":1,"isValid":true, "student": {"id_estudiante":1,"primer_nombre":"John","primer_apellido":"Doe", "correo": "a@f.com"}}`)
 	err = ch.PublishWithContext(ctx,
 		"",     // exchange
 		q.Name, // routing key
@@ -41,4 +42,3 @@ func Test() {
 
 	connection.FailOnError(err, "Failed to connect to RabbitMQ")
 }
-
